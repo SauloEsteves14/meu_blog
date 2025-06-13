@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Meu Blog{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body.light {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        body.dark {
+            background-color: #121212;
+            color: #f1f1f1;
+        }
+
+        body.dark ::placeholder {
+            color: #ccc;
+        }
+
+        .navbar-brand {
+            color: #e0e0e0 !important;
+        }
+
+        .navbar.light {
+            background-color: #545a5f !important;
+        }
+
+        .navbar.dark {
+            background-color: #212529 !important;
+        }
+
+        .list-group-item.dark {
+            background-color: #1e1e1e;
+            color: #f1f1f1;
+            border: 1px solid #333;
+        }
+
+        .list-group-item.light {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+        }
+
+        .form-control.light {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .form-control.dark {
+            background-color: #1e1e1e;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        .dropdown-menu {
+            background-color: #1f1f1f;
+        }
+
+        .dropdown-item {
+            color: #ccc;
+        }
+
+        .dropdown-item:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        body.dark .pagination .page-link {
+            background-color: #1e1e1e;
+            color: #f1f1f1;
+            border-color: #333;
+        }
+
+        body.dark .pagination .page-item.active .page-link {
+            background-color: #333;
+            border-color: #555;
+            color: #fff;
+        }
+
+        body.dark .comment-box {
+            background-color: #1e1e1e;
+            color: #f1f1f1;
+            border-color: #444;
+        }
+
+        body.dark .comment-textarea {
+            background-color: #2c2c2c;
+            color: #f1f1f1;
+            border-color: #555;
+        }
+
+        body.dark .text-muted {
+            color: #ccc !important;  /* ou use #aaa para um tom um pouco mais escuro */
+        }
+
+        body.light .comment-box,
+        .comment-box {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        body.light .comment-textarea,
+        .comment-textarea {
+            background-color: #ffffff;
+            color: #000000;
+        }
+
+        .navbar-toggler {
+            border-color: #ccc;
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.9)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+
+        .btn-outline-light:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        .nav-link {
+            color: #ddd !important;
+        }
+
+        .nav-link:hover {
+            color: #fff !important;
+        }
+
+        .card.dark {
+            background-color: #1e1e1e;
+            color: #f1f1f1;
+            border: 1px solid #333;
+        }
+
+        .card.light {
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+        }
+
+        footer {
+            margin-top: 60px;
+            border-top: 1px solid #333;
+            padding: 20px 0;
+            text-align: center;
+            color: #888;
+        }
+    </style>
+</head>
+<body id="main-body">
+    <nav class="navbar navbar-expand-lg mb-4">
+        <div class="container">
+            <a class="navbar-brand me-3 pe-2" href="/" style="margin-left: 0;">Meu Blog</a>
+
+    <!-- Botão de colapso no mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Alternar navegação">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+    <!-- Conteúdo da navbar colapsável -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+      <!-- Barra de busca -->
+                <form class="d-flex align-items-center ms-1 gap-1 mt-2 mt-lg-0" method="get" action="{% url 'post_list' %}">
+                    <input class="form-control" type="search" name="q" placeholder="Buscar posts..." value="{{ request.GET.q }}">
+                    <button class="btn btn-outline-light" type="submit">Buscar</button>
+                </form>
+
+                <ul class="navbar-nav ms-3 me-auto align-items-center gap-2">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="categoriasDropdown" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">Categorias</a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="categoriasDropdown">
+                            {% for categoria in categorias %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'posts_por_categoria' categoria.id %}">
+                                        {{ categoria.nome }}
+                                    </a>
+                                </li>
+                            {% empty %}
+                                <li><span class="dropdown-item text-muted">Nenhuma categoria</span></li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+
+        <!-- Botão de tema -->
+                    <li class="nav-item">
+                        <button id="theme-toggle" class="btn btn-sm btn-outline-light">☀️</button>
+                    </li>
+                </ul>
+
+      <!-- Área de login/logout/admin -->
+                <ul class="navbar-nav align-items-center gap-2 ms-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/admin/">Admin</a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'logout' %}" class="m-0 p-0">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link btn btn-link p-0 m-0" style="text-decoration: none;">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'registro' %}">Registrar</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="mt-3">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <small>&copy; {{ now|date:"Y" }} Meu Blog. Todos os direitos reservados.</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const body = document.getElementById('main-body');
+        const toggleBtn = document.getElementById('theme-toggle');
+
+        function applyTheme(theme) {
+            body.className = theme;
+            document.querySelectorAll('.card').forEach(card => card.className = `card list-group-item mb-4 ${theme}`);
+            document.querySelectorAll('.form-control').forEach(input => input.className = `form-control ${theme}`);
+            document.querySelector('.navbar').className = `navbar navbar-expand-lg ${theme}`;
+            toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleTheme() {
+            const newTheme = body.className === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        toggleBtn.addEventListener('click', toggleTheme);
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(savedTheme);
+    </script>
+</body>
+</html>

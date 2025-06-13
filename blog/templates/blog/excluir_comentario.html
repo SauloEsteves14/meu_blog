@@ -1,0 +1,11 @@
+{% extends 'blog/base.html' %}
+{% block title %}Excluir Comentário{% endblock %}
+{% block content %}
+<h2>Tem certeza que deseja excluir este comentário?</h2>
+<p><strong>{{ comentario.conteudo }}</strong></p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sim, excluir</button>
+    <a href="{% url 'post_detail' comentario.post.id %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'blog/base.html' %}
+{% block title %}Posts - Meu Blog{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Lista de Posts</h2>
+
+<ul class="list-group">
+    {% for post in page_obj %}
+        <li class="list-group-item card mb-4">
+            <h5>
+                <a href="{% url 'post_detail' post.id %}" class="text-decoration-none text-info">
+                    {{ post.titulo }}
+                </a>
+            </h5>
+
+            {% if post.categoria %}
+                <p><strong>Categoria:</strong>
+                    <a href="{% url 'posts_por_categoria' post.categoria.id %}" class="text-decoration-none text-warning">
+                        {{ post.categoria.nome }}
+                    </a>
+                </p>
+            {% endif %}
+
+            <p>{{ post.conteudo }}</p>
+            <p>
+                <small class="text-muted">
+                    Autor: {{ post.autor.username }} | Criado em: {{ post.data_criacao }}
+                </small>
+            </p>
+
+            <div class="mt-3 ms-4">
+                <h6>Comentários ({{ post.comentarios.count }}):</h6>
+
+                {% if post.comentarios.exists %}
+                    <ul class="list-unstyled">
+                        {% for comentario in post.comentarios.all|slice:":2" %}
+                            <li class="mb-2 border-bottom pb-2">
+                                <strong>{{ comentario.autor.username }}:</strong> {{ comentario.conteudo }}<br>
+                                <small class="text-muted">{{ comentario.data_criacao }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    {% if post.comentarios.count > 2 %}
+                        <a href="{% url 'post_detail' post.id %}" class="btn btn-sm btn-outline-light mt-2">Ver mais</a>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Sem comentários ainda.</p>
+                {% endif %}
+            </div>
+        </li>
+    {% endfor %}
+</ul>
+
+<!-- Paginação -->
+<nav aria-label="Navegação de páginas">
+    <ul class="pagination justify-content-center mt-4" id="pagination">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">Primeira</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Primeira</span></li>
+            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+        {% endif %}
+
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">Próxima</span></li>
+            <li class="page-item disabled"><span class="page-link">Última</span></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endblock %}
